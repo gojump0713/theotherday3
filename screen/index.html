@@ -89,7 +89,7 @@ const DATA = {
     { icon: "camera", title: "본 행사는 유튜브로\n촬영·송출되고 있습니다", highlight: true },
     { icon: "photo", title: "사진 촬영은 자유롭게,\n플래시는 자제해 주세요" }
   ],
-  start:  { target: "10:50", lines: ["잠시 후 행사가", "시작됩니다"], seat: "자리에 착석해 주시기 바랍니다", sub: "휴대폰은 무음으로 전환해 주세요", until: "개회까지", nextIdx: 1 },
+  start:  { target: "10:50", lines: ["잠시 후 행사가", "시작됩니다"], seat: "자리에 착석해 주시기 바랍니다", sub: "휴대폰은 무음으로 전환해 주세요", until: "", nextIdx: 1 },
   resume: { target: "13:00", lines: ["오후 프로그램이", "곧 재개됩니다"], seat: "자리로 돌아와 주시기 바랍니다", sub: "휴대폰은 무음으로 전환해 주세요", until: "재개까지", nextIdx: 6 },
   settings: {
     IDLE_ROTATE_SEC: 60, AUTO_RESUME: true, AUTO_RESUME_AT: "12:50", CAPTION_HOLD_SEC: 8,
@@ -531,7 +531,7 @@ V.countdown = (cfg) => {
     <div class="seat a">${esc(cfg.seat)}<span>${esc(cfg.sub || '')}</span></div>
     ${n ? `<div class="next a"><span class="lbl">NEXT</span><span class="amber">${n.start}</span>&nbsp; ${esc(n.title)} ${n.who ? `<span class="dim">· ${esc(n.who)}</span>` : ''}</div>` : ''}
   </div>
-  <div class="right card"><div class="num a" id="cdnum">--:--</div><div class="until a">${esc(cfg.until)}</div></div></div>`;
+  <div class="right card"><div class="num a" id="cdnum">--:--</div>${cfg.until ? `<div class="until a">${esc(cfg.until)}</div>` : ''}</div></div>`;
 };
 
 V.etiquette = () => `<div class="head a"><span class="tag">NOTICE</span><span class="h1">진행 안내</span></div>
