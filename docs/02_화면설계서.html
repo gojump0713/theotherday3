@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TheOtherDay 2026 화면설계서</title>
+<style>
+  :root{
+    --bg:#f4f6fa; --paper:#fff; --ink:#1b2430; --muted:#5f6b7a; --line:#dde3ec;
+    --navy-900:#061A3F; --navy-700:#0B2E6E; --blue-500:#1C60EF; --cyan-300:#4CC9FF; --amber-400:#F7B32B;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,"Pretendard","Malgun Gothic",system-ui,sans-serif}
+  .wrap{max-width:1240px;margin:0 auto;padding:40px 24px 80px}
+  h1{font-size:30px;margin:0 0 6px}
+  h2{font-size:22px;margin:56px 0 14px;padding-top:18px;border-top:2px solid var(--ink)}
+  h3{font-size:17px;margin:28px 0 10px}
+  .sub{color:var(--muted);margin-bottom:28px}
+  table{border-collapse:collapse;width:100%;background:var(--paper);font-size:14px}
+  th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+  th{background:#eef2f8;font-weight:600}
+  code{background:#eef2f8;padding:1px 6px;border-radius:4px;font-size:13px}
+  .toc{columns:3;gap:24px;font-size:14px}
+  .toc a{color:var(--blue-500);text-decoration:none}
+  .toc li{break-inside:avoid}
+
+  .screen{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:24px;margin:18px 0}
+  .screen h3{margin:0 0 14px;font-size:18px}
+  .screen .id{display:inline-block;font-family:ui-monospace,Consolas,monospace;background:var(--navy-900);color:#fff;padding:2px 8px;border-radius:6px;font-size:12px;margin-left:6px;vertical-align:middle}
+  .spec{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:18px}
+  .spec h4{margin:12px 0 6px;font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .spec ul{margin:0;padding-left:18px}
+  .spec li{margin:3px 0}
+  .spec table{font-size:13px}
+
+  /* 16:9 frame — 1120 x 630 (1920x1080 / 1.714) */
+  .frame{position:relative;width:100%;max-width:1120px;aspect-ratio:16/9;margin:0 auto;background:linear-gradient(180deg,#0B2E6E 0%,#061A3F 70%,#04122c 100%);border-radius:10px;overflow:hidden;color:#fff;box-shadow:0 10px 30px rgba(6,26,63,.25);font-size:12px}
+  .frame::before{content:"";position:absolute;inset:0;background:
+     radial-gradient(45% 40% at 78% 70%,rgba(76,201,255,.35),transparent 70%),
+     radial-gradient(30% 30% at 10% 60%,rgba(76,201,255,.2),transparent 70%);pointer-events:none}
+  .frame .px{position:absolute;right:10px;bottom:6px;font-size:10px;color:rgba(255,255,255,.45);font-family:ui-monospace,monospace;z-index:2}
+  /* zones use % of frame */
+  .z{position:absolute;border:1px dashed rgba(255,255,255,.55);border-radius:6px;background:rgba(255,255,255,.06);padding:6px 9px;line-height:1.3}
+  .z b{display:block;font-size:10px;color:var(--amber-400);letter-spacing:.06em;font-weight:600}
+  .z.top{left:4.2%;right:4.2%;top:3.5%;height:9%;display:flex;align-items:center;justify-content:space-between}
+  .z.bot{left:4.2%;right:4.2%;bottom:3.5%;height:9.5%;display:flex;align-items:center;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.75)}
+  .z.bot .l{display:flex;gap:6px;align-items:center}
+  .logo{display:inline-block;background:rgba(255,255,255,.9);color:var(--navy-900);font-weight:800;font-size:10px;padding:2px 7px;border-radius:3px}
+  .tag{display:inline-block;border:1px solid rgba(255,255,255,.4);padding:1px 7px;border-radius:999px;font-size:9px;letter-spacing:.08em}
+  .tag.amb{border-color:var(--amber-400);color:var(--amber-400)}
+  .big{font-size:26px;font-weight:800;line-height:1.1}
+  .mega{font-size:34px;font-weight:800;line-height:1.1}
+  .amber{color:var(--amber-400)}
+  .cyan{color:var(--cyan-300)}
+  .dim{color:rgba(255,255,255,.7)}
+  .row{display:flex;gap:6px;align-items:center}
+  .chip{background:rgba(255,255,255,.12);border-radius:5px;padding:5px 7px;font-size:10px;flex:1}
+  .qr{width:80px;height:80px;background:repeating-conic-gradient(#fff 0 25%,#000 0 50%) 0 0/10px 10px;border:3px solid #fff;border-radius:3px;flex:none}
+  .pic{background:repeating-linear-gradient(45deg,rgba(255,255,255,.12) 0 6px,rgba(255,255,255,.04) 6px 12px);border-radius:6px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.7);font-size:10px;text-align:center}
+  .note{background:#fff8e6;border-left:4px solid var(--amber-400);padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px}
+  .kbd{display:inline-block;border:1px solid #b8c2d0;border-bottom-width:3px;border-radius:5px;padding:0 6px;font-family:ui-monospace,monospace;font-size:12px;background:#fff}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+  .flow span{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:4px 10px}
+  .flow i{color:var(--muted);font-style:normal}
+  .prog{position:absolute;font-size:9px;line-height:1.25}
+  .prog div{padding:3px 6px;border-bottom:1px solid rgba(255,255,255,.15)}
+  .prog .now{border-left:3px solid var(--amber-400);background:rgba(247,179,43,.15)}
+  .prog .past{opacity:.5}
+  @media (max-width:900px){.spec{grid-template-columns:1fr}.toc{columns:1}.frame{font-size:9px}.mega{font-size:20px}.big{font-size:16px}}
+  @media print{body{background:#fff}.screen{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>TheOtherDay 2026 행사 스크린 — 화면설계서</h1>
+<div class="sub">v1.3 · 2026-11-04 · 가로 16:9 (1920×1080) 인터랙티브 HTML · 관련 문서: <a href="01_작업지시서.md">01_작업지시서.md</a></div>
+
+<table>
+<tr><th style="width:140px">행사</th><td>TheOtherDay 2026 — AI Service Launching Show (행사명 표기: "TheOtherDay 2026", "Jeju" 접두 없음)</td><th style="width:120px">일시</th><td>2026. 11. 05 (목) 10:00 ~ 15:00</td></tr>
+<tr><th>장소</th><td>메종글래드 제주 2F 크리스탈홀</td><th>슬로건</th><td>제주가 만들고 세계인이 사용한다 / Made in Jeju, Used Worldwide</td></tr>
+<tr><th>공동주최</th><td>사단법인 제주인공지능산업협회(JAIIA) · 그린수소 글로컬 선도연구센터 · 제주대학교</td><th>주관</th><td>TilonSoft</td></tr>
+<tr><th>경품 (확정)</th><td colspan="3">1등 HP 노트북 · 2등 삼성 스마트워치 · 3등 삼성 태블릿 · 4등 삼성 무선이어폰 · 15:00 행사 종료 후 추첨</td></tr>
+<tr><th>축전</th><td colspan="3">국회 국방위원장 · 더불어민주당 서울강서구을 국회의원 진성준 — 전문 <code>source/축전-국회 국방위원장 진성준.txt</code>, 화면에 본문을 띄워 사회자가 대독</td></tr>
+<tr><th>발표자 표기</th><td colspan="3">틸론소프트 소속은 <b>이름 + 직함만</b> (회사명 표시 안 함). 외부 발표자·내빈은 이름 + 직함 + 소속</td></tr>
+</table>
+
+<h2 id="toc">0. 화면 목록</h2>
+<ol class="toc">
+  <li><a href="#sc-common">공통 프레임 (상단/하단 바)</a></li>
+  <li><a href="#sc-idle">A. 공통 대기화면 <code>#idle</code></a></li>
+  <li><a href="#sc-about">B. 행사 안내 <code>#about</code></a></li>
+  <li><a href="#sc-program">C. 프로그램 안내 <code>#program</code></a></li>
+  <li><a href="#sc-prize">D-1. 경품 안내 목록 <code>#prize</code></a></li>
+  <li><a href="#sc-prizecard">D-2. 경품 개별 카드 <code>#prize/1~4</code></a></li>
+  <li><a href="#sc-start">E. 행사 시작 / 오후 재개 안내 <code>#start</code> <code>#resume</code></a></li>
+  <li><a href="#sc-etiquette">F. 진행 안내 — 에티켓 <code>#etiquette</code></a></li>
+  <li><a href="#sc-lunch">H. 오찬·네트워킹 <code>#lunch</code></a></li>
+  <li><a href="#sc-section">G. 섹션 간지 템플릿 <code>#s/01~16</code></a></li>
+  <li><a href="#sc-video">G-7. 영상 축사 간지 <code>#s/07</code></a></li>
+  <li><a href="#sc-letter">G-11. 축전 낭독 화면 <code>#s/11</code></a></li>
+  <li><a href="#sc-closing">G-16. 경품추첨·폐회 <code>#s/16</code></a></li>
+  <li><a href="#sc-operator">운영자 오버레이 <code>H 키</code></a></li>
+  <li><a href="#flow">화면 흐름(큐시트) · 단축키</a></li>
+  <li><a href="#data">DATA 구조</a></li>
+</ol>
+
+<!-- ───────────────────────── COMMON ───────────────────────── -->
+<h2 id="sc-common">1. 공통 프레임</h2>
+<div class="screen">
+  <h3>공통 프레임 (전 화면 상속)</h3>
+  <div class="frame"><span class="px">1920×1080</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 10:42</span></div>
+    <div class="z" style="left:4.2%;right:4.2%;top:14.5%;bottom:15%;display:flex;align-items:center;justify-content:center;text-align:center">
+      <div><b>CONTENT AREA</b><span class="dim">1760 × 760<br>안전 마진 좌우 80 / 상하 48</span></div>
+    </div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>구성</h4>
+      <ul>
+        <li><b>상단 바 (h 100px)</b>: 좌 Tilonsoft 화이트 로고(w 260) / 우 <code>THE OTHER DAY 2026</code> 워드마크 + 현재 시각(HH:MM, 1초 갱신, 32px)</li>
+        <li><b>콘텐츠 영역</b>: 1760×760 (상단 바·하단 바 제외, 좌우 마진 80)</li>
+        <li><b>하단 바 (h 110px)</b>: 캐노피 DID와 동일 배열. 좌 <code>공동주최 :</code> JAIIA · 그린수소 글로컬 선도연구센터 · 제주대학교 <code>| 주관 :</code> TilonSoft (화이트 로고, h 56) / 우 비전 문구 2줄 26px</li>
+      </ul>
+    </div>
+    <div>
+      <h4>배경 · 상태</h4>
+      <ul>
+        <li><code>bg/loop_main.mp4</code> 루프 영상(캐노피 DID 구도) + 상단 15%/하단 30% 네이비 그라데이션</li>
+        <li>간지 화면은 하단 바를 <em>그라데이션만</em> 남기고 로고 숨김(세션명 집중)</li>
+        <li>영상 로드 실패 → <code>bg/still_main.jpg</code> 폴백 · <code>?clean=1</code> → 디버그 라벨 숨김 · <span class="kbd">B</span> 블랙아웃</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── A IDLE ───────────────────────── -->
+<h2 id="sc-idle">2. A. 공통 대기화면</h2>
+<div class="screen">
+  <h3>A. 공통 대기화면 <span class="id">#idle</span></h3>
+  <div class="frame"><span class="px">#idle</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026</span></div>
+    <div class="z" style="left:4.2%;top:15%;width:58%;height:12%"><span class="amber" style="letter-spacing:.25em;font-size:10px">JEJU · 2026. 11. 05</span><b>① 행사명</b><div class="mega">TheOtherDay 2026</div></div>
+    <div class="z" style="left:4.2%;top:29%;width:58%;height:9%"><div class="big" style="font-size:18px">AI Service Launching Show</div></div>
+    <div class="z" style="left:4.2%;top:40%;width:58%;height:12%"><b>② 일시 · 장소 · 행사장 안내</b><div class="row" style="font-size:10px"><span>🗓 2026. 11. 05 (목) 10:00 ~ 15:00</span><span class="dim">|</span><span>📍 제주 메종글래드 2F 크리스탈홀</span><span class="dim">|</span><span class="amber">→ 행사장 안내</span> 호텔 2층 크리스탈홀</div></div>
+    <div class="z" style="left:4.2%;top:54%;width:58%;height:14%"><b>③ 런칭 서비스 3종</b><div class="row"><div class="chip">📖 <b style="display:inline;color:#fff">Kstory.ai</b><br><span class="dim">AI 동화 창작 서비스</span></div><div class="chip">🔵 <b style="display:inline;color:#fff">theOther.Town</b><br><span class="dim">배움과 연구의 가능성을 넓히는 AI</span></div><div class="chip">🟩 <b style="display:inline;color:#fff">TheOther.Space 2.0</b><br><span class="dim">경계를 넘어서는 AI 업무환경</span></div></div></div>
+    <div class="z" style="left:4.2%;top:70%;width:58%;height:12%"><b>④ NEXT UP (자동)</b><div style="font-size:11px"><span class="amber">10:50</span> 개회사 <span class="dim">· 차진욱 부사장 · 8분 후</span></div></div>
+    <div class="z" style="right:4.2%;top:15%;width:33%;height:22%;text-align:right"><div style="font-style:italic;font-size:22px;font-weight:700;letter-spacing:.05em">WELCOME</div><b>⑤ 슬로건</b><div style="font-size:10px">제주가 만들고 세계인이 사용한다<br><span class="dim">Made in Jeju, Used Worldwide</span></div></div>
+    <div class="z" style="right:4.2%;top:40%;width:33%;height:42%;text-align:center;display:flex;flex-direction:column;justify-content:center"><b>⑥ 현재 시각</b><div style="font-size:56px;font-weight:700;letter-spacing:.02em;line-height:1">10:42</div><div class="dim" style="font-size:10px;margin-top:4px">2026년 11월 5일 목요일</div></div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>용도</h4>
+      <ul><li>09:30 송출 시작 ~ 개회 전, 발표 전환 중 빈 시간, 운영 기본값(<span class="kbd">0</span>). <b>캐노피 DID와 같은 구성</b>이라 입장객에게 익숙한 첫 화면</li></ul>
+      <h4>요소</h4>
+      <table>
+        <tr><th>#</th><th>요소</th><th>스펙</th></tr>
+        <tr><td>①</td><td>행사명</td><td>112px/800 1줄, 아래 "AI Service Launching Show" 56px/600</td></tr>
+        <tr><td>②</td><td>일시·장소·행사장</td><td>1행 가로 나열 36px, 아이콘 44px, 구분선 white-30. "행사장 안내" 앰버</td></tr>
+        <tr><td>③</td><td>서비스 3종</td><td>3열 카드. 아이콘 72px(캐노피 DID 동일), 서비스명 40px/700, 설명 28px white-70</td></tr>
+        <tr><td>④</td><td>NEXT UP</td><td>DATA.program에서 현재 시각 이후 첫 세션 자동. "N분 후" 1분 갱신. 15:00 이후 "행사가 종료되었습니다"</td></tr>
+        <tr><td>⑤</td><td>WELCOME + 슬로건</td><td>필기체 WELCOME 72px, 국문 36px, 영문 28px</td></tr>
+        <tr><td>⑥</td><td>현재 시각</td><td>200px/700 tabular-nums, 콜론 1초 블링크, 날짜 30px</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>동작</h4>
+      <ul>
+        <li>배경 <code>bg/loop_idle.mp4</code> (구름 롱테이크). 좌측 텍스트 영역 뒤 그라데이션 강화</li>
+        <li><code>IDLE_ROTATE_SEC=60</code> 간격으로 <code>#about → #program → #prize → #etiquette → #idle</code> 순환. 하단 바 위 중앙에 5개 도트 인디케이터</li>
+        <li>아무 키 입력 시 순환 정지(수동 모드), <span class="kbd">0</span> 재입력 시 재개</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── B ABOUT ───────────────────────── -->
+<h2 id="sc-about">3. B. 행사 안내</h2>
+<div class="screen">
+  <h3>B. 행사 안내 <span class="id">#about</span></h3>
+  <div class="frame"><span class="px">#about</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 10:42</span></div>
+    <div class="z" style="left:4.2%;top:15%;width:40%;height:9%"><span class="tag">EVENT INFO</span> <span style="font-size:16px;font-weight:800">행사 안내</span></div>
+    <div class="z" style="left:4.2%;top:26%;width:44%;height:22%"><b>① 행사명 + 슬로건</b><div class="big">TheOtherDay 2026</div><div class="dim" style="font-size:11px">AI Service Launching Show</div><div style="font-size:11px;margin-top:4px">제주가 만들고 세계인이 사용한다<br><span class="dim">Made in Jeju, Used Worldwide</span></div></div>
+    <div class="z" style="left:4.2%;top:50%;width:44%;height:32%"><b>② 일시 / 장소 / 행사장 안내</b>
+      <div class="row" style="margin-top:3px"><div class="chip">🗓 2026. 11. 05 (목)<br>10:00 ~ 15:00</div><div class="chip">📍 제주 메종글래드<br>2F 크리스탈홀</div></div>
+      <div class="chip" style="margin-top:5px"><span class="amber">→ 행사장 안내</span> 호텔 2층 크리스탈홀 · 등록 데스크 홀 입구</div>
+    </div>
+    <div class="z" style="right:4.2%;top:15%;width:47%;height:67%"><b>③ 런칭 서비스 3종</b>
+      <div class="chip" style="margin-top:4px;display:flex;gap:8px;align-items:center"><div class="pic" style="width:36px;height:36px;flex:none">icon</div><div><b style="display:inline;color:#fff;font-size:12px">Kstory.ai</b><br><span class="dim">AI 동화 창작 서비스</span></div></div>
+      <div class="chip" style="margin-top:6px;display:flex;gap:8px;align-items:center"><div class="pic" style="width:36px;height:36px;flex:none">icon</div><div><b style="display:inline;color:#fff;font-size:12px">theOther.Town</b><br><span class="dim">배움과 연구의 가능성을 넓히는 AI</span></div></div>
+      <div class="chip" style="margin-top:6px;display:flex;gap:8px;align-items:center"><div class="pic" style="width:36px;height:36px;flex:none">icon</div><div><b style="display:inline;color:#fff;font-size:12px">TheOther.Space 2.0</b><br><span class="dim">경계를 넘어서는 AI 업무환경</span></div></div>
+    </div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>요소</h4>
+      <table>
+        <tr><th>#</th><th>요소</th><th>스펙</th></tr>
+        <tr><td>헤더</td><td>섹션 라벨</td><td><code>EVENT INFO</code> 태그 26px + "행사 안내" 64px/800</td></tr>
+        <tr><td>①</td><td>행사명·슬로건</td><td>80px/800 → 36px 영문 → 36px 국문 슬로건 + 28px 영문</td></tr>
+        <tr><td>②</td><td>정보 카드</td><td>2열(일시/장소) + 1열 행사장 안내. 카드 bg white 8%, radius 24, 아이콘 48px, 텍스트 36px</td></tr>
+        <tr><td>③</td><td>서비스 3종</td><td>우측 컬럼 세로 3카드, 카드 높이 210px. 아이콘 120px, 서비스명 48px/700, 설명 32px white-70</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>동작</h4>
+      <ul><li>좌 컬럼 ①→② 슬라이드 업, 우 컬럼 카드 3개 stagger 120ms 좌→우 슬라이드 인</li><li>대기 순환 1/4. <span class="kbd">1</span> 바로가기</li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── C PROGRAM ───────────────────────── -->
+<h2 id="sc-program">4. C. 프로그램 안내</h2>
+<div class="screen">
+  <h3>C. 프로그램 안내 <span class="id">#program</span></h3>
+  <div class="frame"><span class="px">#program</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 11:05</span></div>
+    <div class="z" style="left:4.2%;top:14.5%;width:40%;height:8%"><span class="tag">PROGRAM</span> <span style="font-size:15px;font-weight:800">프로그램 안내</span></div>
+    <div class="z" style="left:4.2%;top:24%;width:45.5%;height:59%;padding:0"><div style="padding:4px 8px;font-size:10px" class="amber">● 오전 AM</div>
+      <div class="prog" style="left:0;right:0;top:20px">
+        <div class="past"><span class="dim">10:00–10:50</span> 등록 및 현장 데모부스 관람</div>
+        <div class="past"><span class="dim">10:50–10:55</span> 개회사 <span class="dim">· 차진욱 부사장</span></div>
+        <div class="now"><span class="amber">10:55–11:20 · NOW</span> <b style="display:inline;color:#fff">DstationX, 가상화의 다음 세대</b> <span class="dim">· 민정식 차장</span><div style="height:3px;background:rgba(255,255,255,.2);margin-top:3px;border-radius:2px;padding:0;border:none"><div style="width:40%;height:100%;background:var(--amber-400);padding:0;border:none"></div></div></div>
+        <div><span class="dim">11:20–11:40</span> TheOther.Space 2.0 <span class="dim">· 고상현 본부장</span></div>
+        <div><span class="dim">11:40–12:00</span> 틸론소프트 AI 서비스 소개 <span class="dim">· 이춘성 본부장</span></div>
+        <div><span class="dim">12:00–13:00</span> 오찬 및 네트워킹</div>
+      </div>
+    </div>
+    <div class="z" style="right:4.2%;top:24%;width:45.5%;height:59%;padding:0"><div style="padding:4px 8px;font-size:10px" class="dim">○ 오후 PM</div>
+      <div class="prog" style="left:0;right:0;top:20px">
+        <div><span class="dim">13:00–13:20</span> 환영사 · 축사 <span class="dim">· 강주경 회장 외 5인</span></div>
+        <div><span class="dim">13:20–13:40</span> TheOtherDay 2026을 준비하면서 <span class="dim">· 오은영 본부장 · 박나연 프로 · 홍재영 프로</span></div>
+        <div><span class="dim">13:40–14:20</span> 제주 산업 발전을 위한 AI 모델 서비스의 방향 <span class="dim">· 최백준 대표이사</span></div>
+        <div><span class="dim">14:20–14:40</span> KT클라우드 공공DaaS 소개 <span class="dim">· 박철민 팀장 · KT클라우드</span></div>
+        <div><span class="dim">14:40–15:00</span> 소버린 AI · GPU 가상화 서비스 TheOther.Town 소개 <span class="dim">· 김기환 연구소장</span></div>
+        <div><span class="dim">15:00</span> 경품추첨 · 폐회</div>
+      </div>
+    </div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>레이아웃</h4>
+      <table>
+        <tr><th>영역</th><th>스펙</th></tr>
+        <tr><td>2열</td><td>좌 오전(6행) / 우 오후(6행), 열 폭 860px, 간격 40px. 열 헤더 "오전 AM / 오후 PM" 32px, 현재 열은 앰버</td></tr>
+        <tr><td>행</td><td>높이 100px. 시간 28px white-70 (w 200, tabular) / 세션명 34px/700 / 발표자 26px white-70. 세션명 길면 2줄 허용, 발표자는 줄바꿈</td></tr>
+        <tr><td>NOW 행</td><td>좌 앰버 보더 8px, bg 앰버 15%, <code>NOW</code> 뱃지, 하단 진행 바(경과 비율)</td></tr>
+        <tr><td>상태</td><td>지난 세션 opacity .5, 미래 1.0</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>표기 규칙</h4>
+      <ul>
+        <li>틸론소프트 발표자는 <b>이름 + 직함</b>만 (차진욱 부사장, 민정식 차장 …)</li>
+        <li>외부 발표자는 소속 추가: "박철민 팀장 · KT클라우드"</li>
+        <li>환영사·축사 행은 "강주경 회장 외 5인"으로 축약, 명단은 간지에서 노출</li>
+      </ul>
+      <h4>동작</h4>
+      <ul><li>페이지 전환 없음(한 화면). 1분마다 NOW 행 재계산</li><li>행 12개 stagger 60ms 페이드 인. 대기 순환 2/4. <span class="kbd">2</span> 바로가기</li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── D PRIZE ───────────────────────── -->
+<h2 id="sc-prize">5. D-1. 경품 안내 (목록)</h2>
+<div class="screen">
+  <h3>D-1. 경품 안내 목록 <span class="id">#prize</span></h3>
+  <div class="frame"><span class="px">#prize</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 11:42</span></div>
+    <div class="z" style="left:4.2%;top:14.5%;width:60%;height:8%;display:flex;justify-content:space-between;align-items:center"><span><span class="tag">LUCKY DRAW</span> <span style="font-size:15px;font-weight:800">경품 안내</span></span><span class="amber" style="font-size:12px;font-weight:700">15:00 행사 종료 후 경품추첨</span></div>
+    <div class="z" style="left:4.2%;top:24%;width:60%;height:59%;padding:0">
+      <div class="row" style="padding:6px 9px;border-bottom:1px solid rgba(255,255,255,.15);height:25%"><span class="amber" style="font-size:24px;font-weight:800;width:50px">1등</span><div class="pic" style="width:50px;height:50px;flex:none">img</div><div style="font-size:14px;font-weight:700">HP 노트북</div></div>
+      <div class="row" style="padding:6px 9px;border-bottom:1px solid rgba(255,255,255,.15);height:25%"><span class="amber" style="font-size:24px;font-weight:800;width:50px">2등</span><div class="pic" style="width:50px;height:50px;flex:none">img</div><div style="font-size:14px;font-weight:700">삼성 스마트워치</div></div>
+      <div class="row" style="padding:6px 9px;border-bottom:1px solid rgba(255,255,255,.15);height:25%"><span class="amber" style="font-size:24px;font-weight:800;width:50px">3등</span><div class="pic" style="width:50px;height:50px;flex:none">img</div><div style="font-size:14px;font-weight:700">삼성 태블릿</div></div>
+      <div class="row" style="padding:6px 9px;height:25%"><span class="amber" style="font-size:24px;font-weight:800;width:50px">4등</span><div class="pic" style="width:50px;height:50px;flex:none">img</div><div style="font-size:14px;font-weight:700">삼성 무선이어폰</div></div>
+    </div>
+    <div class="z" style="right:4.2%;top:14.5%;width:31%;height:68.5%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px"><b>경품 참여 QR</b><div class="qr" style="width:120px;height:120px"></div><div style="font-size:11px">QR을 스캔하고<br>경품 추첨에 참여하세요</div><div class="dim" style="font-size:10px">행운의 주인공을 기다립니다</div></div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>요소</h4>
+      <table>
+        <tr><th>요소</th><th>스펙</th></tr>
+        <tr><td>추첨 시각</td><td>"15:00 행사 종료 후 경품추첨" 40px/700 앰버, 헤더 우측</td></tr>
+        <tr><td>경품 행 ×4</td><td>행 높이 160px. 등수 80px/800 앰버(w 180) / 제품 이미지 130×130 투명 PNG + 글로우 / 제품명 48px/700</td></tr>
+        <tr><td>QR 블록</td><td>우측 카드(w 560). QR 360×360 흰 테두리 16px, 안내 34px, 캡션 28px. <code>prize/qr.png</code> = 샘플 pptx 동봉 QR</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="note"><b>경품 확정 (11/04)</b> 1등 HP 노트북 · 2등 삼성 스마트워치 · 3등 삼성 태블릿 · 4등 삼성 무선이어폰</div>
+      <h4>동작</h4>
+      <ul><li>경품 행 stagger 120ms, 제품 이미지 미세 float(3s)</li><li>대기 순환 3/4. <span class="kbd">3</span> 바로가기</li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── D-2 PRIZE CARD ───────────────────────── -->
+<h2 id="sc-prizecard">6. D-2. 경품 개별 카드</h2>
+<div class="screen">
+  <h3>D-2. 경품 개별 카드 <span class="id">#prize/1</span> <span class="id">#prize/2</span> <span class="id">#prize/3</span> <span class="id">#prize/4</span></h3>
+  <div class="frame"><span class="px">#prize/2</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 15:04</span></div>
+    <div class="z" style="left:4.2%;top:16%;width:42%;height:66%;display:flex;flex-direction:column;justify-content:center;border:none;background:none"><span class="tag amb" style="align-self:flex-start">LUCKY DRAW</span><div class="amber" style="font-size:72px;font-weight:800;line-height:1;margin:8px 0">2등</div><b>① 제품명</b><div class="mega" style="font-size:28px">삼성 스마트워치</div><div class="dim" style="font-size:10px;margin-top:10px">● <span class="amber">●</span> ● ●  &nbsp; 4등 → 1등 순 진행</div></div>
+    <div class="z" style="right:4.2%;top:14.5%;width:48%;height:69%;padding:0"><div class="pic" style="width:100%;height:100%">② 제품 이미지 (최대 900×700)<br>투명 PNG · 시안 림라이트</div></div>
+    <div class="z bot" style="border:none;background:linear-gradient(transparent,rgba(6,26,63,.9))"></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>용도</h4>
+      <ul><li>15:00 추첨 진행 중 현재 추첨 등수를 크게 노출. 사회자 큐에 맞춰 <span class="kbd">→</span>로 4등→1등</li></ul>
+      <h4>요소</h4>
+      <table>
+        <tr><th>요소</th><th>스펙</th></tr>
+        <tr><td>등수</td><td>240px/800 앰버, 진입 시 scale .8→1 + 글로우 펄스</td></tr>
+        <tr><td>① 제품명</td><td>88px/800, 2줄 허용</td></tr>
+        <tr><td>② 제품 이미지</td><td>우측 48% 영역, 비율 유지 contain, 드롭섀도 + 시안 림라이트</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>동작</h4>
+      <ul>
+        <li><span class="kbd">8</span>: <code>#prize/4</code> 진입. 이후 <span class="kbd">→</span> 마다 3등, 2등, 1등. 1등에서 <span class="kbd">→</span> → <code>#s/16/end</code> 폐회</li>
+        <li>진입 시 컨페티 2초(canvas, 1등은 4초)</li>
+        <li>하단 바 로고 숨김(제품 집중)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── E START/RESUME ───────────────────────── -->
+<h2 id="sc-start">7. E. 행사 시작 / 오후 재개 안내</h2>
+<div class="screen">
+  <h3>E-1. 행사 시작 안내 <span class="id">#start</span> &nbsp;·&nbsp; E-2. 오후 재개 안내 <span class="id">#resume</span></h3>
+  <div class="frame"><span class="px">#start</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 10:44</span></div>
+    <div class="z" style="left:4.2%;top:16%;width:48%;height:66%;display:flex;flex-direction:column;justify-content:center;border:none;background:none"><b>① 안내 문구</b><div class="mega">잠시 후 행사가<br>시작됩니다</div><b style="margin-top:12px">③ 착석 안내</b><div style="font-size:12px">자리에 착석해 주시기 바랍니다<br><span class="dim">휴대폰은 무음으로 전환해 주세요</span></div><b style="margin-top:12px">④ 첫 세션</b><div style="font-size:11px"><span class="amber">10:50</span> 개회사 <span class="dim">· 차진욱 부사장</span></div></div>
+    <div class="z" style="right:4.2%;top:16%;width:42%;height:66%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center"><b>② 카운트다운 → 10:50</b><div style="font-size:72px;font-weight:700;line-height:1;letter-spacing:.02em">05:32</div><div class="dim" style="font-size:11px;margin-top:6px">개회까지</div></div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>요소</h4>
+      <table>
+        <tr><th>요소</th><th>스펙</th></tr>
+        <tr><td>① 문구</td><td>96px/800 2줄, 좌 컬럼</td></tr>
+        <tr><td>② 카운트다운</td><td>우 카드(w 800). 260px/700 tabular-nums mm:ss. 목표 <code>DATA.start.target="10:50"</code>. 1분 이하 앰버, 0 도달 시 "곧 시작합니다" 80px 펄스로 교체(음수 표시 없음)</td></tr>
+        <tr><td>③ 착석 안내</td><td>40px + 보조 32px</td></tr>
+        <tr><td>④ 다음 세션</td><td>program 자동 바인딩</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>E-2 차이점</h4>
+      <table>
+        <tr><th>항목</th><th>#start</th><th>#resume</th></tr>
+        <tr><td>문구</td><td>잠시 후 행사가 시작됩니다</td><td>오후 프로그램이 곧 재개됩니다</td></tr>
+        <tr><td>목표</td><td>10:50</td><td>13:00</td></tr>
+        <tr><td>착석</td><td>자리에 착석해 주시기 바랍니다</td><td>자리로 돌아와 주시기 바랍니다</td></tr>
+        <tr><td>다음</td><td>개회사 · 차진욱 부사장</td><td>환영사 · 축사 · 강주경 회장 외 5인</td></tr>
+        <tr><td>키</td><td><span class="kbd">4</span>, → #s/01</td><td><span class="kbd">5</span>, → #s/06</td></tr>
+      </table>
+      <div class="note">하나의 컴포넌트 <code>Countdown(target, lines, seat, next)</code>. <code>#countdown?t=14:20&amp;msg=...</code>로 임의 카운트다운 생성 가능. <code>AUTO_RESUME=true</code>면 #lunch에서 12:50에 #resume 자동 전환</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── F ETIQUETTE ───────────────────────── -->
+<h2 id="sc-etiquette">8. F. 진행 안내 — 에티켓</h2>
+<div class="screen">
+  <h3>F. 진행 안내 — 에티켓 <span class="id">#etiquette</span></h3>
+  <div class="frame"><span class="px">#etiquette</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 10:46</span></div>
+    <div class="z" style="left:4.2%;top:14.5%;width:40%;height:8%"><span class="tag">NOTICE</span> <span style="font-size:15px;font-weight:800">진행 안내</span></div>
+    <div class="z" style="left:4.2%;top:25%;width:29%;height:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px"><div class="pic" style="width:70px;height:70px;border-radius:50%;font-size:24px">📵</div><b>① 휴대폰</b><div style="font-size:12px;font-weight:700">휴대폰은 무음 또는<br>진동으로 전환해 주세요</div></div>
+    <div class="z" style="left:35.5%;top:25%;width:29%;height:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;border-color:var(--amber-400)"><div class="pic" style="width:70px;height:70px;border-radius:50%;font-size:24px">▶</div><b>② 유튜브 촬영 고지 <span style="color:#ff4d4d">● REC</span></b><div style="font-size:12px;font-weight:700">본 행사는 유튜브로<br>촬영·송출되고 있습니다</div><div class="dim" style="font-size:9px">촬영을 원치 않으시면 스태프에게 알려주세요</div></div>
+    <div class="z" style="right:4.2%;top:25%;width:29%;height:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px"><div class="pic" style="width:70px;height:70px;border-radius:50%;font-size:24px">📷</div><b>③ 사진 촬영</b><div style="font-size:12px;font-weight:700">사진 촬영은 자유롭게,<br>플래시는 자제해 주세요</div></div>
+    <div class="z" style="left:4.2%;right:4.2%;top:77%;height:6%;border:none;background:none;text-align:center"><span class="dim" style="font-size:10px">원활한 진행을 위해 협조 부탁드립니다</span></div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>요소</h4>
+      <table>
+        <tr><th>#</th><th>카드</th><th>스펙</th></tr>
+        <tr><td>①</td><td>휴대폰 무음</td><td><code>icon/etiquette_phone.png</code> 220px 원형 + 제목 44px/700 2줄</td></tr>
+        <tr><td>②</td><td>유튜브 촬영 고지</td><td><code>icon/etiquette_camera.png</code>, 카드 보더 앰버. 제목 44px + 보조 28px. <b>REC</b> 빨간 점 1초 블링크</td></tr>
+        <tr><td>③</td><td>사진 촬영</td><td><code>icon/etiquette_photo.png</code>, 제목 44px</td></tr>
+      </table>
+    </div>
+    <div>
+      <ul>
+        <li>3열 카드 폭 540px, 높이 540px, 간격 40px, bg white 8%, radius 32</li>
+        <li>문구 <code>DATA.etiquette[]</code>. 촬영 고지는 법무 확정본으로 교체 예정</li>
+        <li>카드 stagger 150ms 아래→위 슬라이드 인. 대기 순환 4/4. <span class="kbd">6</span> 바로가기</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── H LUNCH ───────────────────────── -->
+<h2 id="sc-lunch">9. H. 오찬·네트워킹</h2>
+<div class="screen">
+  <h3>H. 오찬·네트워킹 <span class="id">#lunch</span> (= <span class="id">#s/05</span>)</h3>
+  <div class="frame"><span class="px">#lunch</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 12:14</span></div>
+    <div class="z" style="left:4.2%;top:16%;width:52%;height:66%;display:flex;flex-direction:column;justify-content:center;border:none;background:none"><b>① 타이틀</b><div class="mega" style="font-size:40px">점심시간</div><div class="dim" style="font-size:14px">오찬 및 네트워킹</div><b style="margin-top:10px">② 시간</b><div style="font-size:40px;font-weight:700;line-height:1">12:00–13:00</div><b style="margin-top:10px">③ 재개 안내</b><div style="font-size:12px"><span class="amber">13:00</span>부터 오후 프로그램이 시작됩니다 <span class="dim">· 환영사 · 축사</span></div></div>
+    <div class="z" style="right:4.2%;top:16%;width:36%;height:66%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px"><b>④ 경품 참여 QR</b><div class="qr" style="width:120px;height:120px"></div><div style="font-size:11px">식사 중 QR을 스캔하고<br>경품 추첨에 참여하세요</div></div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <table>
+        <tr><th>요소</th><th>스펙</th></tr>
+        <tr><td>① 타이틀</td><td>"점심시간" 120px/800, "오찬 및 네트워킹" 48px</td></tr>
+        <tr><td>② 시간</td><td>140px/700</td></tr>
+        <tr><td>③ 재개 안내</td><td>40px, "13:00" 앰버, 오후 첫 세션 자동 바인딩</td></tr>
+        <tr><td>④ QR</td><td>360×360 + 안내 34px</td></tr>
+      </table>
+    </div>
+    <div>
+      <ul>
+        <li>12:50(<code>AUTO_RESUME_AT</code>)에 <code>#resume</code> 자동 전환 옵션</li>
+        <li>공통 루프 배경, 상단 그라데이션 약하게(밝은 분위기)</li>
+        <li><span class="kbd">7</span> 바로가기</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── G SECTION ───────────────────────── -->
+<h2 id="sc-section">10. G. 섹션 간지 템플릿</h2>
+<div class="screen">
+  <h3>G. 섹션 간지 템플릿 <span class="id">#s/01</span> ~ <span class="id">#s/16</span></h3>
+  <div class="frame"><span class="px">#s/02</span>
+    <div class="z" style="left:0;top:0;right:0;bottom:0;border:none;border-radius:0;padding:0;background:none"><div class="pic" style="position:absolute;right:0;top:0;width:50%;height:100%;border-radius:0;flex-direction:column;background:repeating-linear-gradient(45deg,rgba(255,255,255,.14) 0 6px,rgba(255,255,255,.05) 6px 12px)"><span>① 섹션 비주얼 (Higgsfield)</span><span style="font-size:9px">1920×1080 풀블리드 · 피사체 우측<br>좌측 55% 네이비 그라데이션</span></div></div>
+    <div class="z top" style="background:none;border:none"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 10:55</span></div>
+    <div class="z" style="left:4.2%;top:22%;width:52%;height:60%;display:flex;flex-direction:column;justify-content:center;border:none;background:none">
+      <span class="tag amb" style="align-self:flex-start">SESSION 02</span>
+      <b style="margin-top:10px">② 세션명</b><div class="mega">DstationX,<br>가상화의 다음 세대</div>
+      <b style="margin-top:14px">③ 발표자 (틸론소프트 → 소속 없음)</b><div style="font-size:20px;font-weight:700">민정식 <span class="dim" style="font-size:13px;font-weight:500">차장</span></div>
+      <div style="margin-top:14px;width:60%"><div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px"><div style="width:12%;height:100%;background:var(--amber-400)"></div></div><span class="dim" style="font-size:9px">전체 진행 2 / 16</span></div>
+    </div>
+    <div class="z bot" style="border:none;background:linear-gradient(transparent,rgba(6,26,63,.95))"></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>레이아웃</h4>
+      <table>
+        <tr><th>영역</th><th>스펙</th></tr>
+        <tr><td>① 비주얼</td><td>1920×1080 <code>section/NN_*.jpg</code> 풀블리드. 피사체는 우측 45%에, 좌측 55%는 네이비 그라데이션(텍스트 영역). Ken Burns 1.0→1.06 scale 20s</td></tr>
+        <tr><td>세션 라벨</td><td><code>SESSION 02</code> 28px 앰버 아웃라인 태그. <b>간지에는 시간을 표시하지 않는다</b>(진행 지연 시 혼선 방지). 시간은 프로그램 안내 화면에서만 노출</td></tr>
+        <tr><td>② 세션명</td><td>96~120px/800, 최대 2줄(좌 컬럼 폭 1000px). 길이에 따라 <code>clamp</code> 자동 축소</td></tr>
+        <tr><td>③ 발표자</td><td>이름 64px/700 + 직함 40px/500 white-70 + (외부만) 소속 34px white-70. 3인(#12)은 가로 나열 "오은영 본부장 · 박나연 프로 · 홍재영 프로" 44px</td></tr>
+        <tr><td>진행 바</td><td>16세션 중 위치. 6px 바(w 600) + 24px 라벨</td></tr>
+      </table>
+      <h4>동작</h4>
+      <ul>
+        <li>진입: 비주얼 페이드 600ms → 라벨·세션명·발표자 stagger 100ms 슬라이드 업</li>
+        <li>DATA.sessions[].time은 운영자 오버레이·NEXT UP 계산에만 사용하고 간지에는 렌더링하지 않음</li>
+        <li><span class="kbd">S</span> + 두 자리로 직접 이동 (S 1 3)</li>
+        <li>정지 화면 기본. 우상단 현재 시각만 유지</li>
+      </ul>
+    </div>
+    <div>
+      <h4>간지 목록 (화면 표기 그대로 · 시간은 운영 참고용, 화면 미표시)</h4>
+      <table>
+        <tr><th>ID</th><th>시간(참고)</th><th>세션명</th><th>발표자 표기</th><th>비주얼</th></tr>
+        <tr><td>s/01</td><td>10:50</td><td>개회사</td><td>차진욱 부사장</td><td>01_opening</td></tr>
+        <tr><td>s/02</td><td>10:55</td><td>DstationX, 가상화의 다음 세대</td><td>민정식 차장</td><td>02_dstationx</td></tr>
+        <tr><td>s/03</td><td>11:20</td><td>TheOther.Space 2.0</td><td>고상현 본부장</td><td>03_space</td></tr>
+        <tr><td>s/04</td><td>11:40</td><td>틸론소프트 AI 서비스 소개</td><td>이춘성 본부장</td><td>04_ai_services</td></tr>
+        <tr><td>s/05</td><td>12:00</td><td>오찬 및 네트워킹</td><td>— (H 화면)</td><td>—</td></tr>
+        <tr><td>s/06</td><td>13:00</td><td>환영사</td><td>강주경 회장 · 사단법인 제주인공지능산업협회</td><td>06_welcome</td></tr>
+        <tr><td>s/07</td><td>13:05</td><td>축사 Ⅰ (영상)</td><td>김한규 국회의원 · 더불어민주당 제주시을</td><td>영상</td></tr>
+        <tr><td>s/08</td><td>13:08</td><td>축사 Ⅱ</td><td>강성의 의원 · 제주특별자치도의회</td><td>08_congrats</td></tr>
+        <tr><td>s/09</td><td>13:11</td><td>축사 Ⅲ</td><td>한권 의원 · 제주특별자치도의회</td><td>08_congrats</td></tr>
+        <tr><td>s/10</td><td>13:14</td><td>축사 Ⅳ</td><td>김상재 센터장 · 그린수소 글로컬 선도연구센터</td><td>10_hydrogen</td></tr>
+        <tr><td>s/11</td><td>13:17</td><td>축전 (낭독)</td><td>진성준 국회 국방위원장 · 더불어민주당 서울강서구을 국회의원</td><td>사진 3장 루프 (G-11)</td></tr>
+        <tr><td>s/12</td><td>13:20</td><td>TheOtherDay 2026을 준비하면서</td><td>오은영 본부장 · 박나연 프로 · 홍재영 프로</td><td>12_backstage</td></tr>
+        <tr><td>s/13</td><td>13:40</td><td>제주 산업 발전을 위한 AI 모델 서비스의 방향</td><td>최백준 대표이사</td><td>13_direction</td></tr>
+        <tr><td>s/14</td><td>14:20</td><td>KT클라우드 공공DaaS 소개</td><td>박철민 팀장 · KT클라우드</td><td>14_ktcloud</td></tr>
+        <tr><td>s/15</td><td>14:40</td><td>소버린 AI · GPU 가상화 서비스 TheOther.Town 소개</td><td>김기환 연구소장</td><td>15_town</td></tr>
+        <tr><td>s/16</td><td>15:00</td><td>경품추첨 · 폐회</td><td>—</td><td>16_closing</td></tr>
+      </table>
+      <div class="note">축사 개별 시각(13:05~13:17)은 20분 블록 균등 배분 임시값. 사회자 큐시트 확정 후 <code>DATA.sessions[].time</code>만 수정.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── G-7 VIDEO ───────────────────────── -->
+<h2 id="sc-video">11. G-7. 영상 축사 간지</h2>
+<div class="screen">
+  <h3>G-7. 영상 축사 간지 <span class="id">#s/07</span></h3>
+  <div class="frame"><span class="px">#s/07</span>
+    <div class="z" style="left:0;top:0;right:0;bottom:0;border:2px solid rgba(255,255,255,.3);border-radius:0;padding:0;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;color:rgba(255,255,255,.6)"><span style="font-size:14px">① 영상 풀스크린 16:9 (1920×1080)</span><span style="font-size:10px">김한규의원_틸론 영상축사.mp4 · 자동 재생</span></div>
+    <div class="z top" style="background:none;border:none"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 13:05</span></div>
+    <div class="z" style="left:4.2%;bottom:14%;width:44%;height:16%;background:rgba(6,26,63,.75);border-left:4px solid var(--amber-400)"><span class="tag amb">SESSION 07 · 축사 Ⅰ · 영상 축사</span><b>② 자막 바</b><div style="font-size:16px;font-weight:800">김한규 <span class="dim" style="font-size:11px;font-weight:500">국회의원</span></div><div class="dim" style="font-size:10px">더불어민주당 제주시을</div></div>
+    <div class="z" style="left:4.2%;right:4.2%;bottom:5%;height:4%;border:none;background:none;padding:0"><div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px"><div style="width:35%;height:100%;background:var(--cyan-300)"></div></div><span class="dim" style="font-size:8px">00:42 / 02:10 (운영자 참고)</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <table>
+        <tr><th>요소</th><th>스펙</th></tr>
+        <tr><td>① 영상</td><td>16:9 원본을 1920×1080 풀스크린(cover). 상단 바는 영상 위에 반투명으로 유지</td></tr>
+        <tr><td>② 자막 바</td><td>좌하단 카드(w 840, h 170), bg 네이비 75%, 앰버 보더 좌 8px. 이름 56px/800 + 직함 36px + 소속 30px. 재생 시작 후 8초 뒤 페이드 아웃(옵션 <code>CAPTION_HOLD_SEC</code>)</td></tr>
+        <tr><td>진행 바</td><td>시안 4px + 경과/전체 24px. <code>?clean=1</code>이면 숨김</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>동작</h4>
+      <ul>
+        <li>진입 시 자동 재생(소리 켜짐). 브라우저 자동재생 정책 때문에 <b>송출 전 페이지에서 1회 클릭/키 입력 필요</b> — 운영 매뉴얼에 명시</li>
+        <li><span class="kbd">Space</span>: 일시정지/재생(이 화면에서는 다음 화면 이동이 아님). <span class="kbd">R</span>: 처음부터</li>
+        <li>종료 시 마지막 프레임 유지. 운영자가 <span class="kbd">→</span>로 다음 간지(#s/08)</li>
+        <li>오디오: 스크린 PC 라인아웃 → 음향 콘솔. 리허설 필수</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── G-11 LETTER ───────────────────────── -->
+<h2 id="sc-letter">12. G-11. 축전 낭독 화면</h2>
+<div class="screen">
+  <h3>G-11. 축전 낭독 화면 <span class="id">#s/11</span> <span class="id">#s/11/1~3</span></h3>
+  <div class="frame"><span class="px">#s/11/2</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 13:17</span></div>
+    <div class="z" style="left:4.2%;top:15%;width:38.5%;height:50%;padding:0;overflow:hidden"><div class="pic" style="width:100%;height:100%;border-radius:6px;flex-direction:column;background:repeating-linear-gradient(45deg,rgba(255,255,255,.14) 0 6px,rgba(255,255,255,.05) 6px 12px)"><span>① 사진 루프 (진성준01 → 02 → 03 → 01 …)</span><span style="font-size:9px">740×560 · object-fit: cover · 6초 간격 크로스페이드 1s</span><span class="dim" style="font-size:9px;margin-top:4px">● <span class="amber">●</span> ●</span></div><span class="tag amb" style="position:absolute;left:8px;top:8px">SESSION 11 · 축전</span></div>
+    <div class="z" style="left:4.2%;top:67%;width:38.5%;height:16%;display:flex;flex-direction:column;justify-content:center"><b>② 발신자 캡션</b><div style="font-size:18px;font-weight:800;line-height:1.1">진성준</div><div class="dim" style="font-size:9px">국회 국방위원장 · 더불어민주당 서울강서구을 국회의원</div><div class="dim" style="font-size:9px">※ 서면 축전 · 사회자 대독</div></div>
+    <div class="z" style="left:45%;right:4.2%;top:15%;height:68%;background:rgba(6,26,63,.55);padding:10px 14px;display:flex;flex-direction:column">
+      <b>③ 축전 본문 (3페이지 중 2)</b>
+      <div style="font-size:10.5px;line-height:1.55;margin-top:4px;flex:1">
+        <p style="margin:0 0 6px">제가 오늘 축하의 말씀을 전하게 된 데에는 특별한 인연이 있습니다. 공동 주최사인 틸론소프트의 최백준 대표이사님은 … ‘강서목민관학교 제18기 회장’직을 맡아 …</p>
+        <p style="margin:0 0 6px">오늘 이 자리에서는 <span class="amber">‘TheOther.Space 2.0’</span>, <span class="amber">‘Kstory.ai’</span>, <span class="amber">‘TheOther.Town’</span>을 비롯한 다양한 AI 서비스들이 소개됩니다. …</p>
+        <p style="margin:0">국회 국방위원장으로서 저는 특히 <span class="amber">‘소버린 AI’</span>에 주목합니다. …</p>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:6px"><span class="dim" style="font-size:9px">④ 페이지 ● <span class="amber">●</span> ● &nbsp; → 키로 다음 페이지</span><span class="dim" style="font-size:9px">2 / 3</span></div>
+    </div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <h4>용도</h4>
+      <ul><li>진성준 의원은 불참, 서면 축전을 <b>사회자가 대독</b>. 축사 간지(정지 화면) 대신 본문을 띄워 청중이 함께 읽도록 함</li></ul>
+      <h4>요소</h4>
+      <table>
+        <tr><th>#</th><th>요소</th><th>스펙</th></tr>
+        <tr><td>①</td><td>사진 루프</td><td>좌 영역 740×560, radius 32. <code>source/진성준01.png, 진성준02.png, 진성준03.jpg</code> 3장을 <b>6초 간격 크로스페이드(1s) 무한 루프</b>. <code>object-fit: cover</code>, 초점 중앙(<code>object-position: 50% 35%</code>, 얼굴 기준). 원본이 4:3·16:9 단체 사진이라 좌우가 잘려도 중앙 인물이 유지되도록 함. 좌상단 <code>SESSION 11 · 축전</code> 태그 오버레이. 하단 3개 도트는 현재 사진</td></tr>
+        <tr><td>②</td><td>발신자 캡션</td><td>사진 아래. 이름 64px/800 + 직함 1줄 30px white-70 ("국회 국방위원장 · 더불어민주당 서울강서구을 국회의원") + "서면 축전 · 사회자 대독" 24px</td></tr>
+        <tr><td>③</td><td>본문 패널</td><td>우 패널(w 980, h 740), bg 네이비 55% + 블러 20px, radius 32, 패딩 56. 본문 38px/500, 행간 1.6, 최대 10줄/페이지. 서비스명·소버린 AI 등 키워드 앰버 강조(DATA에서 <code>**…**</code>로 표시)</td></tr>
+        <tr><td>④</td><td>페이지 도트</td><td>3개 + "2 / 3" 24px</td></tr>
+      </table>
+    </div>
+    <div>
+      <h4>페이지 분할 (원문 그대로, 3페이지)</h4>
+      <table>
+        <tr><th>P</th><th>문단</th></tr>
+        <tr><td>1</td><td>인사(존경하는 제주도민…) / 자기소개(국회 국방위원장 진성준입니다) / 개최 축하 / 공동주최 감사</td></tr>
+        <tr><td>2</td><td>최백준 대표와의 인연(강서목민관학교) / 소개될 AI 서비스 3종 / 소버린 AI와 기술 주권</td></tr>
+        <tr><td>3</td><td>국회 차원의 지원 약속 / 마무리 축하와 기원 / 감사합니다</td></tr>
+      </table>
+      <h4>동작</h4>
+      <ul>
+        <li><code>#s/11</code> 진입 = 1페이지. <span class="kbd">→</span> 마다 2, 3페이지, 3페이지에서 <span class="kbd">→</span> → <code>#s/12</code>. <span class="kbd">←</span>는 이전 페이지</li>
+        <li>페이지 전환: 본문 크로스페이드 400ms. 사진 루프는 페이지와 무관하게 계속 돌고, 3페이지 끝나고 다음 화면으로 가면 정지</li>
+        <li>사진 전처리: 3장을 1480×1120(4:3) 기준으로 리사이즈해 <code>assets/photo/jin_01.jpg ~ jin_03.jpg</code>로 저장(각 500KB 이하). 03은 16:9 원본이라 중앙 크롭</li>
+        <li>자동 넘김 없음(사회자 낭독 속도에 맞춤). 옵션 <code>LETTER_AUTO_SEC=0</code></li>
+        <li>본문은 <code>source/축전-국회 국방위원장 진성준.txt</code>를 DATA.sessions[11].pages에 그대로 옮김. 오탈자·문단 수정은 의원실 확인 전 금지</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── G-16 CLOSING ───────────────────────── -->
+<h2 id="sc-closing">13. G-16. 경품추첨 · 폐회</h2>
+<div class="screen">
+  <h3>G-16. 경품추첨 · 폐회 <span class="id">#s/16</span> <span class="id">#s/16/end</span></h3>
+  <div class="frame"><span class="px">#s/16</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 15:00</span></div>
+    <div class="z" style="left:4.2%;top:16%;width:44%;height:66%;display:flex;flex-direction:column;justify-content:center;border:none;background:none"><span class="tag amb" style="align-self:flex-start">SESSION 16</span><b style="margin-top:8px">① 타이틀</b><div class="mega" style="font-size:40px">경품추첨</div><div class="dim" style="font-size:13px">LUCKY DRAW</div><b style="margin-top:12px">③ 폐회 (→ 키로 전환, #s/16/end)</b><div class="dim" style="font-size:11px">"함께해 주셔서 감사합니다" + 비전 문구 + 컨페티 + 주최 로고 확대</div></div>
+    <div class="z" style="right:4.2%;top:16%;width:46%;height:66%;padding:8px;display:flex;flex-direction:column;justify-content:center;gap:6px"><b>② 경품 요약 2×2 + QR</b><div class="row"><div class="chip" style="text-align:center;padding:10px"><span class="amber" style="font-weight:800;font-size:14px">1등</span><br>HP 노트북</div><div class="chip" style="text-align:center;padding:10px"><span class="amber" style="font-weight:800;font-size:14px">2등</span><br>삼성 스마트워치</div></div><div class="row"><div class="chip" style="text-align:center;padding:10px"><span class="amber" style="font-weight:800;font-size:14px">3등</span><br>삼성 태블릿</div><div class="chip" style="text-align:center;padding:10px"><span class="amber" style="font-weight:800;font-size:14px">4등</span><br>삼성 무선이어폰</div></div><div class="row" style="justify-content:center;gap:10px;margin-top:4px"><div class="qr" style="width:48px;height:48px"></div><span class="dim" style="font-size:9px">참여 QR (마감 안내)</span></div></div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span><span class="dim" style="text-align:right">기술이 만드는 더 나은 일상<br>A More Human Tomorrow with Technology.</span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <table>
+        <tr><th>단계</th><th>내용</th></tr>
+        <tr><td><code>#s/16</code> 추첨 안내</td><td>"경품추첨" 120px + 경품 2×2 카드(각 400×180, 등수 56px 앰버, 제품명 40px) + QR 200px. 사회자 진행에 따라 <span class="kbd">8</span>로 <code>#prize/4</code> 진입</td></tr>
+        <tr><td><code>#s/16/end</code> 폐회</td><td>중앙 정렬. "함께해 주셔서 감사합니다" 104px/800 + "TheOtherDay 2026" 48px + 비전 문구 36px + 컨페티 5초 + 하단 바 로고 1.5배</td></tr>
+      </table>
+    </div>
+    <div>
+      <ul><li>폐회 화면은 철수 시까지 유지. 이후 <span class="kbd">0</span> → 대기화면("행사가 종료되었습니다" 티커)</li><li><span class="kbd">9</span> 바로가기 = <code>#s/16/end</code></li></ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── OPERATOR ───────────────────────── -->
+<h2 id="sc-operator">14. 운영자 오버레이</h2>
+<div class="screen">
+  <h3>운영자 오버레이 <span class="id">H</span></h3>
+  <div class="frame"><span class="px">H 키</span>
+    <div class="z top"><span class="logo">TilonSoft</span><span class="tag">THE OTHER DAY 2026 · 11:18</span></div>
+    <div class="z" style="left:4.2%;right:4.2%;top:14.5%;bottom:14.5%;background:rgba(0,0,0,.78);border-color:var(--cyan-300);padding:10px">
+      <b class="cyan">OPERATOR · 현재 #s/02 DstationX · 다음 #s/03 TheOther.Space 2.0</b>
+      <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:5px;margin-top:8px;font-size:9px">
+        <div class="chip">0 대기</div><div class="chip">1 행사안내</div><div class="chip">2 프로그램</div><div class="chip">3 경품</div><div class="chip">4 시작</div><div class="chip">5 재개</div><div class="chip">6 에티켓</div><div class="chip">7 오찬</div>
+        <div class="chip" style="background:var(--amber-400);color:#000">s01 개회사</div><div class="chip" style="outline:1px solid var(--amber-400)">s02 DstationX</div><div class="chip">s03 Space2.0</div><div class="chip">s04 AI서비스</div><div class="chip">s05 오찬</div><div class="chip">s06 환영사</div><div class="chip">s07 축사Ⅰ▶</div><div class="chip">s08 축사Ⅱ</div>
+        <div class="chip">s09 축사Ⅲ</div><div class="chip">s10 축사Ⅳ</div><div class="chip">s11 축전</div><div class="chip">s12 준비하면서</div><div class="chip">s13 AI방향</div><div class="chip">s14 KT클라우드</div><div class="chip">s15 Town</div><div class="chip">s16 추첨·폐회</div>
+        <div class="chip">p4 4등</div><div class="chip">p3 3등</div><div class="chip">p2 2등</div><div class="chip">p1 1등</div><div class="chip">9 폐회</div><div class="chip">B 블랙아웃</div><div class="chip">F 전체화면</div><div class="chip">H 닫기</div>
+      </div>
+      <div class="dim" style="font-size:9px;margin-top:8px">클릭 시 즉시 이동 후 오버레이 닫힘 · 이미 지난 화면은 앰버, 현재는 앰버 아웃라인</div>
+    </div>
+    <div class="z bot"><span class="l"><span class="dim">공동주최 :</span><span class="logo">JAIIA</span><span class="logo">gH2-RC</span><span class="logo">제주대학교</span><span class="dim">| 주관 :</span><span class="logo">TilonSoft</span></span></div>
+  </div>
+  <div class="spec">
+    <div>
+      <ul>
+        <li>송출 화면 위 반투명 그리드. <b>관객에게 보이므로 전환 직전 짧게만</b>. 평소엔 숫자키·<span class="kbd">S</span>+번호 권장</li>
+        <li>현재/다음 화면 표시, 타일 클릭 이동, 각 타일에 단축키 표기</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li>권장 운영: 노트북 <b>확장 모드</b>로 DID에 송출 창, 노트북 화면에는 같은 페이지를 <code>?console=1</code>로 열어 <code>BroadcastChannel</code>로 원격 전환. 이 경우 오버레이는 콘솔 창에만 표시되고 송출 창은 깨끗하게 유지</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ───────────────────────── FLOW ───────────────────────── -->
+<h2 id="flow">15. 화면 흐름(큐시트) · 단축키</h2>
+<h3>당일 기본 흐름 (<span class="kbd">→</span> 순서)</h3>
+<div class="flow">
+  <span>#idle (09:30~)</span><i>→</i><span>#etiquette</span><i>→</i><span>#start (10:45)</span><i>→</i><span>#s/01 개회사</span><i>→</i><span>#s/02</span><i>→</i><span>#s/03</span><i>→</i><span>#s/04</span><i>→</i><span>#lunch (12:00)</span><i>→</i><span>#resume (12:50)</span><i>→</i><span>#s/06 환영사</span><i>→</i><span>#s/07 영상축사</span><i>→</i><span>#s/08~10</span><i>→</i><span>#s/11 축전 낭독 (3p)</span><i>→</i><span>#s/12</span><i>→</i><span>#s/13</span><i>→</i><span>#s/14</span><i>→</i><span>#s/15</span><i>→</i><span>#s/16 추첨안내</span><i>→</i><span>#prize/4 → 3 → 2 → 1</span><i>→</i><span>#s/16/end 폐회</span>
+</div>
+<p style="font-size:14px;color:var(--muted)">발표 사이 Q&amp;A·세팅 지연이 길어지면 <span class="kbd">2</span>(프로그램) 또는 <span class="kbd">0</span>(대기)로 전환 후 <span class="kbd">S</span>+번호로 복귀.</p>
+
+<h3>단축키 전체</h3>
+<table>
+  <tr><th style="width:200px">키</th><th>동작</th></tr>
+  <tr><td><span class="kbd">→</span> <span class="kbd">Space</span> <span class="kbd">PgDn</span></td><td>다음 화면 (큐시트 순). 영상 화면에서 Space는 재생/일시정지</td></tr>
+  <tr><td><span class="kbd">←</span> <span class="kbd">PgUp</span></td><td>이전 화면</td></tr>
+  <tr><td><span class="kbd">0</span></td><td>대기화면 (자동 순환 재개)</td></tr>
+  <tr><td><span class="kbd">1</span>~<span class="kbd">7</span></td><td>1 행사안내 · 2 프로그램 · 3 경품 · 4 시작안내 · 5 재개안내 · 6 에티켓 · 7 오찬</td></tr>
+  <tr><td><span class="kbd">8</span> / <span class="kbd">9</span></td><td>8 경품 추첨 카드(4등부터) / 9 폐회</td></tr>
+  <tr><td><span class="kbd">S</span> + 2자리</td><td>섹션 간지 직접 이동 (S 0 7 → 영상 축사). 2초 내 입력, 좌하단에 입력 중 표시</td></tr>
+  <tr><td><span class="kbd">F</span></td><td>전체화면 토글</td></tr>
+  <tr><td><span class="kbd">H</span></td><td>운영자 오버레이</td></tr>
+  <tr><td><span class="kbd">B</span></td><td>블랙아웃</td></tr>
+  <tr><td><span class="kbd">R</span></td><td>영상 처음부터 (영상 화면에서만)</td></tr>
+  <tr><td><span class="kbd">T</span></td><td>시계·NEXT UP 표시 토글 (리허설용)</td></tr>
+</table>
+
+<!-- ───────────────────────── DATA ───────────────────────── -->
+<h2 id="data">16. DATA 구조 (index.html 상단)</h2>
+<pre style="background:#0f172a;color:#e2e8f0;padding:18px;border-radius:10px;font-size:13px;line-height:1.5;overflow:auto">const DATA = {
+  event: {
+    name: "TheOtherDay 2026", sub: "AI Service Launching Show",
+    slogan: ["제주가 만들고 세계인이 사용한다", "Made in Jeju, Used Worldwide"],
+    vision: ["기술이 만드는 더 나은 일상", "A More Human Tomorrow with Technology."],
+    date: "2026-11-05", dateLabel: "2026. 11. 05 (목) 10:00 ~ 15:00",
+    venue: "제주 메종글래드 2F 크리스탈홀", venueGuide: "호텔 2층 크리스탈홀",
+    hosts: ["jaiia_w.png", "gh2_w.png", "jejunu_w.svg"], organizer: "tilonsoft_w.png",
+    services: [
+      { name: "Kstory.ai", desc: "AI 동화 창작 서비스", icon: "svc_kstory.png" },
+      { name: "theOther.Town", desc: "배움과 연구의 가능성을 넓히는 AI", icon: "svc_town.png" },
+      { name: "TheOther.Space 2.0", desc: "경계를 넘어서는 AI 업무환경", icon: "svc_space.png" }
+    ]
+  },
+  // 발표자: 틸론소프트 소속은 org 생략 → 이름+직함만 렌더링. 외부만 org 기재
+  program: [
+    { start: "10:00", end: "10:50", title: "등록 및 현장 데모부스 관람" },
+    { start: "10:50", end: "10:55", title: "개회사", who: "차진욱 부사장" },
+    { start: "10:55", end: "11:20", title: "DstationX, 가상화의 다음 세대", who: "민정식 차장" },
+    { start: "11:20", end: "11:40", title: "TheOther.Space 2.0", who: "고상현 본부장" },
+    { start: "11:40", end: "12:00", title: "틸론소프트 AI 서비스 소개", who: "이춘성 본부장" },
+    { start: "12:00", end: "13:00", title: "오찬 및 네트워킹", page: "pm-break" },
+    { start: "13:00", end: "13:20", title: "환영사 · 축사", who: "강주경 회장 외 5인" },
+    { start: "13:20", end: "13:40", title: "TheOtherDay 2026을 준비하면서", who: "오은영 본부장 · 박나연 프로 · 홍재영 프로" },
+    { start: "13:40", end: "14:20", title: "제주 산업 발전을 위한 AI 모델 서비스의 방향", who: "최백준 대표이사" },
+    { start: "14:20", end: "14:40", title: "KT클라우드 공공DaaS 소개", who: "박철민 팀장 · KT클라우드" },
+    { start: "14:40", end: "15:00", title: "소버린 AI · GPU 가상화 서비스 TheOther.Town 소개", who: "김기환 연구소장" },
+    { start: "15:00", end: "15:30", title: "경품추첨, 폐회" }
+  ],
+  sessions: [
+    { id: "01", time: "10:50–10:55", title: "개회사", name: "차진욱", role: "부사장", bg: "01_opening.jpg" },
+    { id: "02", time: "10:55–11:20", title: "DstationX, 가상화의 다음 세대", name: "민정식", role: "차장", bg: "02_dstationx.jpg" },
+    { id: "03", time: "11:20–11:40", title: "TheOther.Space 2.0", name: "고상현", role: "본부장", bg: "03_space.jpg" },
+    { id: "04", time: "11:40–12:00", title: "틸론소프트 AI 서비스 소개", name: "이춘성", role: "본부장", bg: "04_ai_services.jpg" },
+    { id: "05", type: "lunch" },
+    { id: "06", time: "13:00", title: "환영사", name: "강주경", role: "회장", org: "사단법인 제주인공지능산업협회", bg: "06_welcome.jpg" },
+    { id: "07", time: "13:05", title: "축사 Ⅰ", name: "김한규", role: "국회의원", org: "더불어민주당 제주시을", video: "video/kimhankyu_congrats.mp4" },
+    { id: "08", time: "13:08", title: "축사 Ⅱ", name: "강성의", role: "의원", org: "제주특별자치도의회", bg: "08_congrats.jpg" },
+    { id: "09", time: "13:11", title: "축사 Ⅲ", name: "한권", role: "의원", org: "제주특별자치도의회", bg: "08_congrats.jpg" },
+    { id: "10", time: "13:14", title: "축사 Ⅳ", name: "김상재", role: "센터장", org: "그린수소 글로컬 선도연구센터", bg: "10_hydrogen.jpg" },
+    { id: "11", time: "13:17", title: "축전", type: "letter", name: "진성준", role: "국회 국방위원장",
+      org: "더불어민주당 서울강서구을 국회의원",
+      photos: ["photo/jin_01.jpg", "photo/jin_02.jpg", "photo/jin_03.jpg"], photoIntervalSec: 6,
+      pages: [ /* source/축전-국회 국방위원장 진성준.txt 를 3페이지로 분할, G-11 참조 */ ] },
+    { id: "12", time: "13:20–13:40", title: "TheOtherDay 2026을 준비하면서",
+      speakers: [{ name: "오은영", role: "본부장" }, { name: "박나연", role: "프로" }, { name: "홍재영", role: "프로" }], bg: "12_backstage.jpg" },
+    { id: "13", time: "13:40–14:20", title: "제주 산업 발전을 위한 AI 모델 서비스의 방향", name: "최백준", role: "대표이사", bg: "13_direction.jpg" },
+    { id: "14", time: "14:20–14:40", title: "KT클라우드 공공DaaS 소개", name: "박철민", role: "팀장", org: "KT클라우드", bg: "14_ktcloud.jpg" },
+    { id: "15", time: "14:40–15:00", title: "소버린 AI · GPU 가상화 서비스 TheOther.Town 소개", name: "김기환", role: "연구소장", bg: "15_town.jpg" },
+    { id: "16", time: "15:00", title: "경품추첨 · 폐회", bg: "16_closing.jpg", type: "closing" }
+  ],
+  prizes: [
+    { rank: 1, name: "HP 노트북", img: "prize/laptop.png" },
+    { rank: 2, name: "삼성 스마트워치", img: "prize/watch.png" },
+    { rank: 3, name: "삼성 태블릿", img: "prize/tablet.png" },
+    { rank: 4, name: "삼성 무선이어폰", img: "prize/earbuds.png" }
+  ],
+  prizeQR: "prize/qr.png", drawTimeLabel: "15:00 행사 종료 후 경품추첨",
+  etiquette: [
+    { icon: "etiquette_phone.png", title: "휴대폰은 무음 또는\n진동으로 전환해 주세요" },
+    { icon: "etiquette_camera.png", title: "본 행사는 유튜브로\n촬영·송출되고 있습니다", sub: "촬영을 원치 않으시면 스태프에게 알려주세요", highlight: true },
+    { icon: "etiquette_photo.png", title: "사진 촬영은 자유롭게,\n플래시는 자제해 주세요" }
+  ],
+  start:  { target: "10:50", lines: ["잠시 후 행사가", "시작됩니다"], seat: "자리에 착석해 주시기 바랍니다" },
+  resume: { target: "13:00", lines: ["오후 프로그램이", "곧 재개됩니다"], seat: "자리로 돌아와 주시기 바랍니다" },
+  settings: { IDLE_ROTATE_SEC: 60, AUTO_RESUME: true, AUTO_RESUME_AT: "12:50", CAPTION_HOLD_SEC: 8, SAFE_X: 80, SAFE_Y: 48 }
+};</pre>
+
+<div class="note" style="margin-top:28px"><b>확정 대기 항목</b> ① 축사 개별 시각·순서(사회자 큐시트) ② 유튜브 촬영 고지 문구(법무) ③ 현장 스크린 실제 해상도(1920×1080 / 3840×2160) ④ 영상 축사 오디오 경로. <b>확정 완료</b>: 가로 16:9, 경품 등수, 틸론소프트 발표자 소속 미표기, 진성준 의원 축전 전문(낭독 화면), 행사명 표기 "TheOtherDay 2026".</div>
+
+</div>
+</body>
+</html>

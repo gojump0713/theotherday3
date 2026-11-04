@@ -1,0 +1,9 @@
+# Office lock files
+~$*
+# OS / editor
+Thumbs.db
+.DS_Store
+# local app config
+.claude/
+# scratch
+*.log
