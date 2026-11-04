@@ -49,7 +49,7 @@ const DATA = {
     { id: "08", title: "축사 Ⅱ", name: "강성의", role: "의원", org: "제주특별자치도의회", bg: "assets/section/08_congrats.jpg" },
     { id: "09", title: "축사 Ⅲ", name: "한권", role: "의원", org: "제주특별자치도의회", bg: "assets/section/08_congrats.jpg" },
     { id: "10", title: "축사 Ⅳ", name: "김상재", role: "센터장", org: "그린수소 글로컬 선도연구센터", bg: "assets/section/10_hydrogen.jpg" },
-    { id: "11", title: "축전", type: "letter", name: "진성준", role: "국회 국방위원장", org: "더불어민주당 서울강서구을 국회의원",
+    { id: "11", title: "축전", type: "letter", name: "진성준", role: "국회 국방위원장", org: "더불어민주당 서울강서구을 국회의원", bg: "assets/section/08_congrats.jpg",
       photos: ["assets/photo/jin_01.jpg", "assets/photo/jin_02.jpg", "assets/photo/jin_03.jpg"], photoIntervalSec: 2,
       // source/축전-국회 국방위원장 진성준.txt 원문 그대로. **…** 는 앰버 강조
       pages: [
@@ -576,8 +576,8 @@ V.end = () => `<div id="end"><div class="h a">함께해 주셔서<br>감사합�
    큐시트 & 라우팅
    ===================================================================== */
 const CUE = ['idle', 'about', 'program', 'prize', 'etiquette', 'start', 's/01', 's/02', 's/03', 's/04', 'lunch', 'resume', 's/06', 's/07', 's/07/play', 's/08', 's/09', 's/10',
-  's/11/1', 's/11/2', 's/11/3', 's/12', 's/13', 's/14', 's/15', 's/16', 'prize/4', 'prize/3', 'prize/2', 'prize/1', 's/16/end'];
-const LABELS = { 's/07/play': '영상 재생 ▶', idle: '대기', about: '행사안내', program: '프로그램', prize: '경품', start: '시작안내', resume: '재개안내', etiquette: '에티켓', lunch: '오찬', 's/16/end': '폐회' };
+  's/11', 's/11/1', 's/11/2', 's/11/3', 's/12', 's/13', 's/14', 's/15', 's/16', 'prize/4', 'prize/3', 'prize/2', 'prize/1', 's/16/end'];
+const LABELS = { 's/07/play': '영상 재생 ▶', 's/11/1': '축전 낭독 1/3', idle: '대기', about: '행사안내', program: '프로그램', prize: '경품', start: '시작안내', resume: '재개안내', etiquette: '에티켓', lunch: '오찬', 's/16/end': '폐회' };
 function label(r) {
   if (LABELS[r]) return LABELS[r];
   if (r.startsWith('prize/')) return r.split('/')[1] + '등';
@@ -612,7 +612,7 @@ function render(r) {
     if (!s) { html = V.idle(); }
     else if (s.type === 'lunch') html = V.lunch();
     else if (s.type === 'video') { if (c === 'play') { html = ''; playVideo(s); } else { html = V.section(s); document.body.classList.add('leftText', 'noLogos'); if (s.bg) showSecBg(s.bg); } }
-    else if (s.type === 'letter') { html = V.letter(s, Math.max(0, Math.min(s.pages.length - 1, (+c || 1) - 1))); document.body.classList.add('leftText'); }
+    else if (s.type === 'letter') { if (c) { html = V.letter(s, Math.max(0, Math.min(s.pages.length - 1, (+c) - 1))); document.body.classList.add('leftText'); } else { html = V.section(s); document.body.classList.add('leftText', 'noLogos'); if (s.bg) showSecBg(s.bg); } }
     else if (s.type === 'closing') { html = c === 'end' ? V.end() : V.closing(); if (c === 'end') document.body.classList.add('bigLogos'); }
     else { html = V.section(s); document.body.classList.add('leftText', 'noLogos'); if (s.bg) showSecBg(s.bg); }
   }
@@ -632,7 +632,7 @@ function render(r) {
   if (a === 'idle') { timers.push(setInterval(() => { const n = $('#nextup'); if (n) n.innerHTML = nextUpHTML(); }, 60000)); startIdleRotate(); } else stopIdleRotate();
   if (a === 'program') timers.push(setInterval(() => { if (route === 'program') { const w = $('#content .screen.on'); if (w) w.innerHTML = V.program(); requestAnimationFrame(() => w.querySelectorAll('.a').forEach(x => x.style.transition = 'none')); } }, 60000));
   if (a === 'start' || a === 'resume' || a === 'countdown') runCountdown(a === 'countdown' ? (q.get('ct') || '00:00') : DATA[a].target);
-  if (a === 's' && b === '11') runPhotoLoop(DATA.sessions.find(x => x.id === '11'));
+  if (a === 's' && b === '11' && c) runPhotoLoop(DATA.sessions.find(x => x.id === '11'));
   if (a === 'lunch' && S.AUTO_RESUME) timers.push(setInterval(() => { if (nowMin() >= toMin(S.AUTO_RESUME_AT) && nowMin() < toMin(DATA.resume.target) + 1) go('resume'); }, 15000));
   if ((a === 'prize' && b) || c === 'end') confetti(b === '1' || c === 'end' ? 4500 : 2000);
 
@@ -763,7 +763,7 @@ $('#navR').onclick = () => { manual = true; cueNext(1); };
 function renderOp() {
   const op = $('#op'); if (!op.classList.contains('on')) return;
   const all = ['idle', 'about', 'program', 'prize', 'start', 'resume', 'etiquette', 'lunch',
-    ...DATA.sessions.filter(s => s.type !== 'lunch').flatMap(s => s.type === 'video' ? ['s/' + s.id, 's/' + s.id + '/play'] : ['s/' + s.id]), 'prize/4', 'prize/3', 'prize/2', 'prize/1', 's/16/end'];
+    ...DATA.sessions.filter(s => s.type !== 'lunch').flatMap(s => s.type === 'video' ? ['s/' + s.id, 's/' + s.id + '/play'] : s.type === 'letter' ? ['s/' + s.id, 's/' + s.id + '/1'] : ['s/' + s.id]), 'prize/4', 'prize/3', 'prize/2', 'prize/1', 's/16/end'];
   const keys = { idle: '0', about: '1', program: '2', prize: '3', start: '4', resume: '5', etiquette: '6', lunch: '7', 'prize/4': '8', 's/16/end': '9' };
   const ci = CUE.indexOf(route);
   const nxt = ci >= 0 && ci < CUE.length - 1 ? CUE[ci + 1] : '';

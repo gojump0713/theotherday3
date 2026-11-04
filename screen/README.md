@@ -39,7 +39,7 @@ https://gojump0713.github.io/theotherday3/ (GitHub Pages, main 푸시 시 자동
 
 ## 큐시트 (→ 키 순서)
 
-idle → about 행사안내 → program 프로그램 → prize 경품 → etiquette → start(10:50 카운트다운) → s/01 개회사 → s/02 → s/03 → s/04 → lunch → resume(13:00 카운트다운) → s/06 환영사 → s/07 영상축사 안내 간지 → s/07/play 영상 재생 → s/08 → s/09 → s/10 → s/11/1 → s/11/2 → s/11/3 (축전 3페이지) → s/12 → s/13 → s/14 → s/15 → s/16 추첨안내 → prize/4 → prize/3 → prize/2 → prize/1 → s/16/end 폐회
+idle → about 행사안내 → program 프로그램 → prize 경품 → etiquette → start(10:50 카운트다운) → s/01 개회사 → s/02 → s/03 → s/04 → lunch → resume(13:00 카운트다운) → s/06 환영사 → s/07 영상축사 안내 간지 → s/07/play 영상 재생 → s/08 → s/09 → s/10 → s/11 축전 간지 → s/11/1 → s/11/2 → s/11/3 (축전 낭독 3페이지) → s/12 → s/13 → s/14 → s/15 → s/16 추첨안내 → prize/4 → prize/3 → prize/2 → prize/1 → s/16/end 폐회
 
 URL 해시로 직접 진입 가능: `index.html#s/13`, `index.html#prize/1`
 
