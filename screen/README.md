@@ -26,6 +26,7 @@ https://gojump0713.github.io/theotherday3/ (GitHub Pages, main 푸시 시 자동
 |---|---|
 | → / Space / PgDn | 다음 화면 (큐시트 순) · 영상 화면에서 Space는 재생/일시정지 |
 | ← / PgUp | 이전 화면 |
+| 마우스 | 화면 좌우 가장자리에 마우스를 올리면 ‹ › 버튼이 나타남 (클릭으로 이전/다음). `?clean=1`이면 숨김 |
 | 0 | 대기화면 (60초 자동 순환: 대기→행사안내→프로그램→경품→에티켓) |
 | 1~7 | 1 행사안내 · 2 프로그램 · 3 경품 · 4 시작안내 · 5 재개안내 · 6 에티켓 · 7 오찬 |
 | 8 / 9 | 8 경품 추첨 카드(4등부터) / 9 폐회 |
@@ -38,7 +39,7 @@ https://gojump0713.github.io/theotherday3/ (GitHub Pages, main 푸시 시 자동
 
 ## 큐시트 (→ 키 순서)
 
-idle → etiquette → start(10:50 카운트다운) → s/01 개회사 → s/02 → s/03 → s/04 → lunch → resume(13:00 카운트다운) → s/06 환영사 → s/07 영상축사 안내 간지 → s/07/play 영상 재생 → s/08 → s/09 → s/10 → s/11/1 → s/11/2 → s/11/3 (축전 3페이지) → s/12 → s/13 → s/14 → s/15 → s/16 추첨안내 → prize/4 → prize/3 → prize/2 → prize/1 → s/16/end 폐회
+idle → about 행사안내 → program 프로그램 → prize 경품 → etiquette → start(10:50 카운트다운) → s/01 개회사 → s/02 → s/03 → s/04 → lunch → resume(13:00 카운트다운) → s/06 환영사 → s/07 영상축사 안내 간지 → s/07/play 영상 재생 → s/08 → s/09 → s/10 → s/11/1 → s/11/2 → s/11/3 (축전 3페이지) → s/12 → s/13 → s/14 → s/15 → s/16 추첨안내 → prize/4 → prize/3 → prize/2 → prize/1 → s/16/end 폐회
 
 URL 해시로 직접 진입 가능: `index.html#s/13`, `index.html#prize/1`
 

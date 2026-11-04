@@ -324,6 +324,11 @@ body.bigLogos #botbar .hosts{width:100%;justify-content:center}
 #op button.past{background:rgba(247,179,43,.35)}
 #op button small{display:block;color:rgba(255,255,255,.8);font-size:19px;font-weight:500;margin-top:4px}
 #op .hint{margin-top:20px;color:rgba(255,255,255,.8);font-size:24px}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:72px;height:140px;border:0;border-radius:16px;background:rgba(6,26,63,.35);color:rgba(255,255,255,.55);font-size:72px;line-height:1;cursor:pointer;z-index:30;opacity:0;transition:opacity .3s,background .3s;font-family:inherit}
+#navL{left:8px}#navR{right:8px}
+#stage:hover .nav{opacity:1}
+.nav:hover{background:rgba(6,26,63,.7);color:#fff}
+body.clean .nav{display:none}
 #dbg{position:absolute;left:12px;bottom:8px;font-size:14px;color:rgba(255,255,255,.35);z-index:60;font-family:ui-monospace,monospace}
 body.clean #dbg{display:none}
 #skey{position:absolute;left:80px;bottom:120px;z-index:60;font-size:28px;background:rgba(0,0,0,.6);padding:8px 18px;border-radius:10px;display:none;font-family:ui-monospace,monospace}
@@ -357,6 +362,7 @@ body.clean #dbg{display:none}
   <div id="op"></div>
   <div id="black"></div>
   <div id="skey"></div>
+  <button id="navL" class="nav" aria-label="이전 화면">&#8249;</button><button id="navR" class="nav" aria-label="다음 화면">&#8250;</button>
   <div id="dbg"></div>
 </div>
 
@@ -569,7 +575,7 @@ V.end = () => `<div id="end"><div class="h a">함께해 주셔서<br>감사합�
 /* =====================================================================
    큐시트 & 라우팅
    ===================================================================== */
-const CUE = ['idle', 'etiquette', 'start', 's/01', 's/02', 's/03', 's/04', 'lunch', 'resume', 's/06', 's/07', 's/07/play', 's/08', 's/09', 's/10',
+const CUE = ['idle', 'about', 'program', 'prize', 'etiquette', 'start', 's/01', 's/02', 's/03', 's/04', 'lunch', 'resume', 's/06', 's/07', 's/07/play', 's/08', 's/09', 's/10',
   's/11/1', 's/11/2', 's/11/3', 's/12', 's/13', 's/14', 's/15', 's/16', 'prize/4', 'prize/3', 'prize/2', 'prize/1', 's/16/end'];
 const LABELS = { 's/07/play': '영상 재생 ▶', idle: '대기', about: '행사안내', program: '프로그램', prize: '경품', start: '시작안내', resume: '재개안내', etiquette: '에티켓', lunch: '오찬', 's/16/end': '폐회' };
 function label(r) {
@@ -718,10 +724,7 @@ function confetti(ms) {
    ===================================================================== */
 function cueNext(dir) {
   let i = CUE.indexOf(route);
-  if (i < 0) { // 큐시트 밖 화면이면 가장 가까운 다음 간지로
-    if (route === 'about' || route === 'program' || route === 'prize') return go(dir > 0 ? 'start' : 'idle');
-    i = 0;
-  }
+  if (i < 0) i = 0; // 큐시트 밖 화면(countdown 등)이면 처음부터
   const n = Math.max(0, Math.min(CUE.length - 1, i + dir));
   go(CUE[n]);
 }
@@ -755,6 +758,8 @@ addEventListener('keydown', e => {
   }
   if (route === 'idle' && k !== '0') stopIdleRotate();
 });
+$('#navL').onclick = () => { manual = true; cueNext(-1); };
+$('#navR').onclick = () => { manual = true; cueNext(1); };
 function renderOp() {
   const op = $('#op'); if (!op.classList.contains('on')) return;
   const all = ['idle', 'about', 'program', 'prize', 'start', 'resume', 'etiquette', 'lunch',
