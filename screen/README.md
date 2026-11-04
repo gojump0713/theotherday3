@@ -2,6 +2,10 @@
 
 가로 16:9 (1920×1080) 단일 HTML. 인터넷 없이 동작합니다.
 
+## 배포 URL
+
+https://gojump0713.github.io/theotherday3/ (GitHub Pages, main 푸시 시 자동 배포). 현장 송출은 네트워크 변수를 피하기 위해 이 폴더의 로컬 복사본을 권장합니다.
+
 ## 실행
 
 1. `screen` 폴더째 송출 PC로 복사
@@ -58,8 +62,9 @@ assets/
   photo/  jin_01~03.jpg (축전 화면 사진 루프)
   video/  kimhankyu_congrats.mp4 (영상 축사)
   bg/     still_main.jpg (정지 배경, 영상 로드 실패 시 폴백)
-          loop_main.mp4  (일반 화면 배경 루프, 1280×720 8.5s, Higgsfield Kling 3.0 + ffmpeg 크로스페이드 루프)
+          loop_main.mp4  (일반 화면 배경 루프, 1920×1080 8.5s, Higgsfield Kling 3.0 → ByteDance 1080p 업스케일, ffmpeg 크로스페이드 루프)
           loop_idle.mp4  (대기화면 배경 루프, 동일 규격)
+          _720/          (업스케일 전 720p 원본, 저사양 PC용 예비)
   section/ 01_opening ~ 16_closing.jpg (간지 배경 12장, Higgsfield GPT Image, 1920×1080. 07은 08_congrats, 09는 08_congrats 공용)
 ```
 
